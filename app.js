@@ -1,10 +1,5 @@
-const { readFile, writeFile } = require("fs");
+const _ = require("lodash");
 
-readFile("./content/first.txt", "utf-8", (err, result) => {
-  if (err) {
-    console.log(err);
-    return;
-  }
-
-  console.log(result);
-});
+const items = [1, [2, [3, [4]]]];
+const newItems = _.flattenDeep(items);
+console.log(newItems);
