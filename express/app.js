@@ -1,25 +1,37 @@
-const http = require("http");
-const { readFileSync } = require("fs");
+const express = require("express");
+const app = express();
+let { people } = require("./data");
 
-const homePage = readFileSync("./navbar-app/index.html ");
+// static assets
+app.use(express.static("./methods-public"));
 
-const server = http.createServer((req, res) => {
-  const url = req.url;
-
-  if (url === "/") {
-    res.writeHead(200, { "content-type": "text/html" });
-    // res.write("<h1>Home Page</h1>");
-    res.write(homePage);
-    res.end();
-  } else if (url === "/about") {
-    res.writeHead(200, { "content-type": "text/html" });
-    res.write("<h1>About Page</h1>");
-    res.end();
-  } else {
-    res.writeHead(404, { "content-type": "text/html" });
-    res.write("<h1>About Page</h1>");
-    res.end();
-  }
+// parse form data
+app.use(express.urlencoded({ extended: false }));
+// parse json
+app.use(express.json());
+app.get("/api/people", (req, res) => {
+  res.status(200).json({ success: true, data: people });
 });
 
-server.listen(5000);
+app.post("/api/people", (req, res) => {
+  const { name } = req.body;
+  if (!name) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide name value" });
+  }
+  res.status(201).json({ success: true, person: name });
+});
+
+app.post("/login", (req, res) => {
+  const { name } = req.body;
+
+  if (name) {
+    return res.status(200).send(`Welcome ${name}`);
+  }
+  res.status(401).send("Please provide credentials");
+});
+
+app.listen(5000, () => {
+  console.log("Server listening on port 5000 ...");
+});
